@@ -7,15 +7,19 @@
  * 실행: npx tsx scripts/fetch-comments.ts
  */
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 // ─── 설정 ───────────────────────────────
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY;
 
-const VIDEO_ID = "n8fdEYaDtfM"; // 김선태 '김선태입니다' 영상
-const MIN_SUBSCRIBER_COUNT = 10000; // 기업 계정 필터 기준 (구독자 1만 이상)
+// 수집 대상 영상 목록 (새 영상 추가 시 여기에 ID 추가)
+const VIDEO_IDS = [
+    "n8fdEYaDtfM",  // 김선태입니다
+    "9OWG7ulgUN4",  // 2번째 영상
+];
+const MIN_SUBSCRIBER_COUNT = 1000; // 기업 계정 필터 기준 (구독자 1천 이상)
 
 // ─── 타입 정의 ───────────────────────────
 interface YouTubeComment {
@@ -126,7 +130,7 @@ async function fetchChannelInfoBatch(
 // ─── Supabase 저장 ──────────────────────
 
 async function upsertCompanies(
-    supabase: ReturnType<typeof createClient>,
+    supabase: SupabaseClient,
     companies: Array<{
         name: string;
         channelId: string;
@@ -139,10 +143,29 @@ async function upsertCompanies(
         commentId: string;
     }>
 ) {
-    console.log(`💾 Supabase에 ${companies.length}개 기업 댓글 저장 중...`);
-
+    // 같은 채널의 댓글이 여러 개면 좋아요가 가장 높은 것만 남기기
+    const bestByChannel = new Map<string, (typeof companies)[0]>();
     for (const company of companies) {
-        const { error } = await supabase.from("companies").upsert(
+        const existing = bestByChannel.get(company.authorChannelId);
+        if (!existing || company.youtubeLikes > existing.youtubeLikes) {
+            bestByChannel.set(company.authorChannelId, company);
+        }
+    }
+
+    const deduped = [...bestByChannel.values()];
+    console.log(`💾 Supabase에 ${deduped.length}개 기업 댓글 저장 중... (중복 채널 제거: ${companies.length} → ${deduped.length})`);
+
+    for (const company of deduped) {
+        // 기존 votes 값 보존을 위해 먼저 조회
+        const { data: existingRow } = await supabase
+            .from("companies")
+            .select("votes")
+            .eq("author_channel_id", company.authorChannelId)
+            .single();
+
+        const existingVotes = (existingRow as { votes: number } | null)?.votes ?? 0;
+
+        const { error } = await (supabase.from("companies") as any).upsert(
             {
                 name: company.name,
                 channel_id: company.channelId,
@@ -154,9 +177,9 @@ async function upsertCompanies(
                 is_verified: false,
                 video_id: company.videoId,
                 comment_id: company.commentId,
-                votes: 0,
+                votes: existingVotes,
             },
-            { onConflict: "comment_id" }
+            { onConflict: "author_channel_id" }
         );
 
         if (error) {
@@ -185,11 +208,17 @@ async function main() {
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     console.log("🚀 김선태 유튜브 기업 댓글 수집 시작\n");
-    console.log(`📌 대상 영상: https://www.youtube.com/watch?v=${VIDEO_ID}`);
+    console.log(`📌 대상 영상: ${VIDEO_IDS.length}개`);
+    VIDEO_IDS.forEach((id, i) => console.log(`   ${i + 1}. https://www.youtube.com/watch?v=${id}`));
     console.log(`📌 필터 기준: 구독자 ${MIN_SUBSCRIBER_COUNT.toLocaleString()}명 이상\n`);
 
-    // 1. 영상의 모든 댓글 가져오기
-    const allComments = await fetchAllComments(VIDEO_ID);
+    // 1. 모든 영상의 댓글 가져오기
+    const allComments: (YouTubeComment & { videoId: string })[] = [];
+    for (const videoId of VIDEO_IDS) {
+        const comments = await fetchAllComments(videoId);
+        allComments.push(...comments.map((c) => ({ ...c, videoId })));
+    }
+    console.log(`📊 전체 영상 총 ${allComments.length}개 댓글 수집\n`);
 
     // 2. 고유 채널 ID 추출
     const uniqueChannelIds = [...new Set(allComments.map((c) => c.authorChannelId).filter(Boolean))];
@@ -225,7 +254,7 @@ async function main() {
             logoUrl: channelInfo.thumbnailUrl,
             authorChannelId: comment.authorChannelId,
             subscriberCount: channelInfo.subscriberCount,
-            videoId: VIDEO_ID,
+            videoId: comment.videoId,
             commentId: comment.commentId,
         };
     });

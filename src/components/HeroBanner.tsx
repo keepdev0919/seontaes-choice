@@ -22,21 +22,23 @@ const HeroBanner = () => {
             className="h-full w-full object-cover"
           />
         </div>
-        <div className="flex flex-col items-start gap-0.5">
+        <div className="flex flex-col items-start gap-1">
           <a
             href="https://www.youtube.com/@kimseontae"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[10px] text-muted-foreground transition-colors hover:text-red-500 md:text-xs"
+            className="flex items-center gap-1.5 text-[11px] font-medium text-gray-300 transition-colors hover:text-red-400 md:text-xs"
           >
+            <Youtube className="h-3.5 w-3.5 md:h-4 md:w-4" />
             youtube.com/@kimseontae
           </a>
           <a
             href="https://www.instagram.com/kimseontae_official"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[10px] text-muted-foreground transition-colors hover:text-pink-500 md:text-xs"
+            className="flex items-center gap-1.5 text-[11px] font-medium text-gray-300 transition-colors hover:text-pink-400 md:text-xs"
           >
+            <Instagram className="h-3.5 w-3.5 md:h-4 md:w-4" />
             instagram.com/kimseontae_official
           </a>
         </div>

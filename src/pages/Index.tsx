@@ -42,12 +42,12 @@ const Index = () => {
       <section className="container mx-auto px-4 pb-12">
         <div className="grid gap-6 lg:grid-cols-2">
           <FactBoard companies={companies} onVote={handleVote} />
-          <VotingBooth companies={companies} onVote={handleVote} />
+          <VotingBooth companies={companies} />
         </div>
       </section>
 
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        선태의 선택 · Powered by Supabase
+        선태의 선택
       </footer>
     </div>
   );

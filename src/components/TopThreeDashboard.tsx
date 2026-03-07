@@ -40,7 +40,7 @@ const TopThreeDashboard = ({ companies }: TopThreeDashboardProps) => {
                 />
                 <div>
                   <h3 className="text-lg font-bold text-foreground">{company.name}</h3>
-                  <p className="text-xs text-muted-foreground">@{company.channelId}</p>
+                  <p className="text-xs text-muted-foreground">구독자 {company.subscriberCount?.toLocaleString()}명</p>
                 </div>
               </div>
 
