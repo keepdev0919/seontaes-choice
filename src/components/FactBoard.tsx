@@ -63,42 +63,54 @@ const FactBoard = ({ initialCompanies }: FactBoardProps) => {
 
   return (
     <div className="flex flex-col rounded-xl border border-border bg-card">
-      <div className="flex items-center gap-2 border-b border-border px-5 py-4">
-        <MessageSquare className="h-5 w-5 text-primary" />
-        <h2 className="text-xl text-primary">실시간 유튜브 댓글</h2>
-        <span className="ml-1 text-sm text-muted-foreground/80 font-medium">
+      <div className="flex min-w-0 items-center gap-2 border-b border-border px-5 py-4">
+        <MessageSquare className="h-5 w-5 shrink-0 text-primary" />
+        <h2 className="shrink-0 text-xl text-primary">실시간 유튜브 댓글</h2>
+        <span className="ml-1 shrink-0 text-sm font-medium text-muted-foreground/80">
           {search ? `(${sorted.length} / 총 ${companies.length}개)` : `(총 ${companies.length}개)`}
         </span>
 
         {/* ? 안내 아이콘 */}
-        <div className="relative">
-          <button
-            onClick={() => setShowTooltip(!showTooltip)}
-            className="flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <HelpCircle className="h-4 w-4" />
-          </button>
-          <AnimatePresence>
-            {showTooltip && (
+        <button
+          onClick={() => setShowTooltip(true)}
+          className="flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <HelpCircle className="h-4 w-4" />
+        </button>
+
+        {/* 팝업 오버레이 */}
+        <AnimatePresence>
+          {showTooltip && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+              onClick={() => setShowTooltip(false)}
+            >
               <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                className="absolute left-1/2 top-8 z-50 w-56 -translate-x-1/2 rounded-lg border border-border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-lg"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="mx-4 w-full max-w-sm rounded-xl border border-border bg-popover p-5 text-sm text-popover-foreground shadow-xl"
+                onClick={(e) => e.stopPropagation()}
               >
-                <p className="font-semibold">자동 수집</p>
-                <p className="mt-1 text-muted-foreground">
+                <p className="mb-2 font-semibold text-foreground">자동 수집</p>
+                <p className="text-muted-foreground">
                   1시간마다 김선태 유튜브 영상의 기업 댓글(구독자 1천+)을 자동 수집합니다.
                 </p>
-                <div
-                  className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-border bg-popover"
-                />
+                <button
+                  onClick={() => setShowTooltip(false)}
+                  className="mt-4 w-full rounded-lg bg-secondary py-2 text-xs font-medium text-foreground hover:bg-secondary/80"
+                >
+                  닫기
+                </button>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <span className="ml-auto text-xs text-muted-foreground">좋아요 순</span>
+        <span className="ml-auto hidden shrink-0 text-xs text-muted-foreground sm:block">좋아요 순</span>
       </div>
 
       <div className="border-b border-border px-4 py-2">
@@ -114,7 +126,7 @@ const FactBoard = ({ initialCompanies }: FactBoardProps) => {
         </div>
       </div>
 
-      <ScrollArea className="h-[880px]">
+      <ScrollArea className="h-[420px] md:h-[880px]">
         <div className="divide-y divide-border">
           {sorted.map((company, idx) => (
             <motion.div
@@ -122,7 +134,7 @@ const FactBoard = ({ initialCompanies }: FactBoardProps) => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: idx * 0.08 }}
-              className="flex gap-3 px-5 py-4 transition-colors hover:bg-secondary/50"
+              className="flex gap-3 px-3 py-3 transition-colors hover:bg-secondary/50 md:px-5 md:py-4"
             >
               <img
                 src={company.logoUrl}
@@ -140,39 +152,56 @@ const FactBoard = ({ initialCompanies }: FactBoardProps) => {
                 <p className="mb-2 text-sm leading-relaxed text-muted-foreground line-clamp-2">
                   {company.commentText}
                 </p>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <ThumbsUp className="h-3 w-3" />
-                  <span className="font-semibold text-foreground">
-                    {company.youtubeLikes.toLocaleString()}
-                  </span>
-                  {/* 유튜브 출처 아이콘 — 클릭하면 영상으로 이동 */}
-                  {company.videoId && (
-                    <a
-                      href={`https://www.youtube.com/watch?v=${company.videoId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-1 flex items-center gap-1 text-muted-foreground transition-colors hover:text-red-500"
-                      title="원본 영상 보기"
-                    >
-                      <Youtube className="h-3.5 w-3.5" />
-                      <span className="max-w-[120px] truncate text-[10px]">
-                        {VIDEO_TITLES[company.videoId] || "영상 보기"}
-                      </span>
-                    </a>
-                  )}
+                <div className="flex items-center justify-between gap-2">
+                  {/* 좋아요 + 유튜브 링크 */}
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <ThumbsUp className="h-3 w-3" />
+                    <span className="font-semibold text-foreground">
+                      {company.youtubeLikes.toLocaleString()}
+                    </span>
+                    {company.videoId && (
+                      <a
+                        href={`https://www.youtube.com/watch?v=${company.videoId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-1 flex items-center gap-1 text-muted-foreground transition-colors hover:text-red-500"
+                        title="원본 영상 보기"
+                      >
+                        <Youtube className="h-3.5 w-3.5" />
+                        <span className="max-w-[80px] truncate text-[10px]">
+                          {VIDEO_TITLES[company.videoId] || "영상 보기"}
+                        </span>
+                      </a>
+                    )}
+                  </div>
+                  {/* 모바일 투표 버튼 (인라인) */}
+                  <button
+                    onClick={() => handleVote(company)}
+                    className={`flex shrink-0 items-center gap-1 rounded-md border px-2 py-1 text-xs font-bold transition-all md:hidden ${
+                      votedId === company.id
+                        ? "border-primary bg-primary/20 text-primary"
+                        : votedId
+                          ? "cursor-not-allowed border-border bg-secondary/30 text-muted-foreground opacity-50"
+                          : "border-primary/30 bg-primary/5 text-primary hover:border-primary hover:bg-primary/15 active:scale-95"
+                    }`}
+                    title={votedId ? (votedId === company.id ? "투표 완료" : "이미 투표함") : `${company.name}에 투표`}
+                  >
+                    <Vote className="h-3 w-3" />
+                    {votedId === company.id ? "완료" : "투표"}
+                  </button>
                 </div>
               </div>
 
-              {/* 정사각형 투표 버튼 */}
+              {/* 데스크탑 투표 버튼 */}
               <button
                 onClick={() => handleVote(company)}
-
-                className={`mt-1 flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg border transition-all ${votedId === company.id
-                  ? "border-primary bg-primary/20 text-primary"
-                  : votedId
-                    ? "cursor-not-allowed border-border bg-secondary/30 text-muted-foreground opacity-50"
-                    : "border-primary/30 bg-primary/5 text-primary hover:border-primary hover:bg-primary/15 active:scale-95"
-                  }`}
+                className={`mt-1 hidden h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg border transition-all md:flex ${
+                  votedId === company.id
+                    ? "border-primary bg-primary/20 text-primary"
+                    : votedId
+                      ? "cursor-not-allowed border-border bg-secondary/30 text-muted-foreground opacity-50"
+                      : "border-primary/30 bg-primary/5 text-primary hover:border-primary hover:bg-primary/15 active:scale-95"
+                }`}
                 title={votedId ? (votedId === company.id ? "투표 완료" : "이미 투표함") : `${company.name}에 투표`}
               >
                 <Vote className="h-4 w-4" />

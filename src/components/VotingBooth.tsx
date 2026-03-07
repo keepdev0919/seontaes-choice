@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Trophy, TrendingUp, Search } from "lucide-react";
+import { Trophy, Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Company } from "@/data/mockData";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -23,11 +23,11 @@ const VotingBooth = ({ initialCompanies }: VotingBoothProps) => {
   const maxVotes = ranked[0]?.votes || 1;
 
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-card">
-      <div className="flex items-center gap-2 border-b border-border px-5 py-4">
-        <Trophy className="h-5 w-5 text-primary" />
-        <h2 className="text-xl text-primary">실시간 투표 리더보드</h2>
-        <span className="ml-auto text-xs text-muted-foreground">득표 순</span>
+    <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
+      <div className="flex min-w-0 items-center gap-2 border-b border-border px-5 py-4">
+        <Trophy className="h-5 w-5 shrink-0 text-primary" />
+        <h2 className="shrink-0 text-xl text-primary">실시간 투표 리더보드</h2>
+        <span className="ml-auto hidden shrink-0 text-xs text-muted-foreground sm:block">득표 순</span>
       </div>
 
       <div className="border-b border-border px-4 py-2">
@@ -43,7 +43,7 @@ const VotingBooth = ({ initialCompanies }: VotingBoothProps) => {
         </div>
       </div>
 
-      <ScrollArea className="h-[880px]">
+      <ScrollArea className="h-[420px] md:h-[880px]">
         <div className="divide-y divide-border">
           {filtered.map((company) => {
             const idx = company.rank - 1;
@@ -57,9 +57,9 @@ const VotingBooth = ({ initialCompanies }: VotingBoothProps) => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: search ? 0 : idx * 0.06 }}
-                className="px-5 py-3 transition-colors hover:bg-secondary/30"
+                className="px-3 py-3 transition-colors hover:bg-secondary/30 md:px-5"
               >
-                <div className="mb-2 flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3">
                   <span
                     className={`flex shrink-0 items-center justify-center rounded-full font-black ${company.rank <= 3 ? "h-8 w-8 text-sm" : "h-6 w-6 text-xs"
                       } ${company.rank === 1
@@ -82,40 +82,51 @@ const VotingBooth = ({ initialCompanies }: VotingBoothProps) => {
                       (e.target as HTMLImageElement).src = "/placeholder.svg";
                     }}
                   />
-                  <span
-                    className={`min-w-0 flex-1 truncate font-bold text-foreground ${company.rank <= 3 ? "text-base" : "text-sm"
-                      }`}
-                  >
-                    {company.name}
-                  </span>
-                  <div className={`flex items-baseline gap-1 ${company.rank <= 3 ? "text-sm" : "text-xs"}`}>
-                    <span className="font-black text-primary">
-                      {company.votes.toLocaleString()}
-                    </span>
-                    <span className="text-muted-foreground">표</span>
+                  <div className="min-w-0 flex-1">
+                    {/* 이름 + 득표수(데스크탑) */}
+                    <div className="flex items-center justify-between gap-1">
+                      <span
+                        className={`min-w-0 flex-1 truncate font-bold text-foreground ${company.rank <= 3 ? "text-base" : "text-sm"
+                          }`}
+                      >
+                        {company.name}
+                      </span>
+                      <div className={`hidden shrink-0 items-baseline gap-1 md:flex ${company.rank <= 3 ? "text-sm" : "text-xs"}`}>
+                        <span className="font-black text-primary">
+                          {company.votes.toLocaleString()}
+                        </span>
+                        <span className="text-muted-foreground">표</span>
+                      </div>
+                    </div>
+                    {/* 모바일: 득표수 + 퍼센트 */}
+                    <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground md:hidden">
+                      <span className="font-bold text-primary">{company.votes.toLocaleString()}</span>
+                      <span>표</span>
+                      <span>·</span>
+                      <span>{percentage}%</span>
+                    </div>
+                    {/* 비율 바 */}
+                    <div className="mt-1.5 flex items-center gap-2 pr-1">
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${ratio}%` }}
+                          transition={{ delay: idx * 0.06 + 0.3, duration: 0.6, ease: "easeOut" }}
+                          className={`h-full rounded-full ${company.rank === 1
+                            ? "bg-yellow-500"
+                            : company.rank === 2
+                              ? "bg-gray-400"
+                              : company.rank === 3
+                                ? "bg-amber-600"
+                                : "bg-accent/50"
+                            }`}
+                        />
+                      </div>
+                      <span className="hidden w-10 text-right text-[10px] text-muted-foreground md:block">
+                        {percentage}%
+                      </span>
+                    </div>
                   </div>
-                </div>
-
-                {/* 비율 바 */}
-                <div className="ml-9 flex items-center gap-2">
-                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${ratio}%` }}
-                      transition={{ delay: idx * 0.06 + 0.3, duration: 0.6, ease: "easeOut" }}
-                      className={`h-full rounded-full ${company.rank === 1
-                        ? "bg-yellow-500"
-                        : company.rank === 2
-                          ? "bg-gray-400"
-                          : company.rank === 3
-                            ? "bg-amber-600"
-                            : "bg-accent/50"
-                        }`}
-                    />
-                  </div>
-                  <span className="w-10 text-right text-[10px] text-muted-foreground">
-                    {percentage}%
-                  </span>
                 </div>
               </motion.div>
             );
