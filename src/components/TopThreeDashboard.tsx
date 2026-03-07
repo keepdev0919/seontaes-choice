@@ -1,14 +1,18 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { Trophy, TrendingUp } from "lucide-react";
 import type { Company } from "@/data/mockData";
+import { useCompanies } from "@/hooks/useCompanies";
 
 interface TopThreeDashboardProps {
-  companies: Company[];
+  initialCompanies: Company[];
 }
 
 const medals = ["🥇", "🥈", "🥉"];
 
-const TopThreeDashboard = ({ companies }: TopThreeDashboardProps) => {
+const TopThreeDashboard = ({ initialCompanies }: TopThreeDashboardProps) => {
+  const { data: companies = [] } = useCompanies(initialCompanies);
   const top3 = [...companies].sort((a, b) => b.votes - a.votes).slice(0, 3);
 
   return (

@@ -1,13 +1,15 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThumbsUp, MessageSquare, Vote, HelpCircle, Youtube, Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import type { Company } from "@/data/mockData";
+import { useCompanies, useVote } from "@/hooks/useCompanies";
 
 interface FactBoardProps {
-  companies: Company[];
-  onVote: (companyId: string) => void;
+  initialCompanies: Company[];
 }
 
 // 영상 ID → 제목 매핑 (새 영상 추가 시 여기에도 추가)
@@ -33,7 +35,10 @@ function setVotedToday(companyId: string) {
   localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify({ date: today, companyId }));
 }
 
-const FactBoard = ({ companies, onVote }: FactBoardProps) => {
+const FactBoard = ({ initialCompanies }: FactBoardProps) => {
+  const { data: companies = [] } = useCompanies(initialCompanies);
+  const voteMutation = useVote();
+
   const [votedId, setVotedId] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [search, setSearch] = useState("");
@@ -52,7 +57,7 @@ const FactBoard = ({ companies, onVote }: FactBoardProps) => {
     }
     setVotedToday(company.id);
     setVotedId(company.id);
-    onVote(company.id);
+    voteMutation.mutate(company.id);
     toast.success(`${company.name}에 투표 완료! 🎉`);
   };
 

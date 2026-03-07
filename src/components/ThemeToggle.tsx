@@ -1,16 +1,20 @@
+"use client";
+
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const ThemeToggle = () => {
-    const [isDark, setIsDark] = useState(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("theme");
-            return saved ? saved === "dark" : true; // 기본값: 다크모드
-        }
-        return true;
-    });
+    const [isDark, setIsDark] = useState(true);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        const saved = localStorage.getItem("theme");
+        setIsDark(saved ? saved === "dark" : true);
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!mounted) return;
         const root = document.documentElement;
         if (isDark) {
             root.classList.add("dark");
@@ -19,7 +23,9 @@ const ThemeToggle = () => {
             root.classList.remove("dark");
             localStorage.setItem("theme", "light");
         }
-    }, [isDark]);
+    }, [isDark, mounted]);
+
+    if (!mounted) return null;
 
     return (
         <button

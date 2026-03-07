@@ -1,14 +1,18 @@
+"use client";
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Trophy, TrendingUp, Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Company } from "@/data/mockData";
+import { useCompanies } from "@/hooks/useCompanies";
 
 interface VotingBoothProps {
-  companies: Company[];
+  initialCompanies: Company[];
 }
 
-const VotingBooth = ({ companies }: VotingBoothProps) => {
+const VotingBooth = ({ initialCompanies }: VotingBoothProps) => {
+  const { data: companies = [] } = useCompanies(initialCompanies);
   const [search, setSearch] = useState("");
   const ranked = [...companies]
     .sort((a, b) => b.votes - a.votes)
