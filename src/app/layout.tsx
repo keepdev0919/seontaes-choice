@@ -8,6 +8,9 @@ import ThemeToggle from "@/components/ThemeToggle";
 export const metadata: Metadata = {
     title: "선태의 선택",
     description: "충주시 김선태 주무관 관련 투표 현황 (Next.js 고성능 버전)",
+    icons: {
+        icon: "/seontae_profile.jpg",
+    },
 };
 
 export default function RootLayout({
