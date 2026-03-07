@@ -45,22 +45,11 @@ const fetchCompanies = async (): Promise<Company[]> => {
     return (data as CompanyRow[]).map(mapRowToCompany);
 };
 
-// 투표 처리 (votes + 1)
+// 투표 처리 (안전한 RPC 호출로 변경: votes + 1)
 const voteForCompany = async (companyId: string): Promise<void> => {
-    const { data: current, error: fetchError } = await supabase
-        .from("companies")
-        .select("votes")
-        .eq("id", companyId)
-        .single();
+    const { error } = await supabase.rpc("increment_vote", { row_id: companyId });
 
-    if (fetchError) throw fetchError;
-
-    const { error: updateError } = await supabase
-        .from("companies")
-        .update({ votes: (current as { votes: number }).votes + 1 })
-        .eq("id", companyId);
-
-    if (updateError) throw updateError;
+    if (error) throw error;
 };
 
 export const useCompanies = () => {

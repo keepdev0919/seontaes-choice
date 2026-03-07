@@ -12,7 +12,8 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 // ─── 설정 ───────────────────────────────
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
-const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY;
+// RLS(보안 정책) 우회를 위해 서비스 역할 키(Service Role Key) 우선 사용
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
 // 수집 대상 영상 목록 (새 영상 추가 시 여기에 ID 추가)
 const VIDEO_IDS = [
