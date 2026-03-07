@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Youtube, Instagram, TrendingUp } from "lucide-react";
+import Image from "next/image";
 
 const HeroBanner = () => {
   return (
@@ -20,10 +21,13 @@ const HeroBanner = () => {
             className="absolute left-0 flex flex-col items-center gap-1.5"
           >
             <div className="h-16 w-16 overflow-hidden rounded-full border-2 border-primary/50 shadow-lg shadow-primary/20">
-              <img
+              <Image
                 src="/images/channels4_profile.jpg"
-                alt="김선태 프로필"
+                alt="충주맨 유튜버 김선태 프로필 사진"
+                width={64}
+                height={64}
                 className="h-full w-full object-cover"
+                priority
               />
             </div>
             <div className="flex items-center gap-2">
@@ -65,10 +69,13 @@ const HeroBanner = () => {
         className="absolute left-10 top-8 z-10 hidden flex-col items-center gap-2 md:flex"
       >
         <div className="h-36 w-36 overflow-hidden rounded-full border-2 border-primary/50 shadow-lg shadow-primary/20">
-          <img
+          <Image
             src="/images/channels4_profile.jpg"
-            alt="김선태 프로필"
+            alt="충주맨 유튜버 김선태 프로필 사진"
+            width={144}
+            height={144}
             className="h-full w-full object-cover"
+            priority
           />
         </div>
         <div className="flex flex-col items-start gap-1">
