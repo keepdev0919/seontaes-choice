@@ -168,13 +168,11 @@ async function upsertCompanies(
         const { error } = await (supabase.from("companies") as any).upsert(
             {
                 name: company.name,
-                channel_id: company.channelId,
                 comment_text: company.commentText,
                 youtube_likes: company.youtubeLikes,
                 logo_url: company.logoUrl,
                 author_channel_id: company.authorChannelId,
                 subscriber_count: company.subscriberCount,
-                is_verified: false,
                 video_id: company.videoId,
                 comment_id: company.commentId,
                 votes: existingVotes,
