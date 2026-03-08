@@ -2,6 +2,7 @@ import HeroBanner from "@/components/HeroBanner";
 import TopThreeDashboard from "@/components/TopThreeDashboard";
 import FactBoard from "@/components/FactBoard";
 import VotingBooth from "@/components/VotingBooth";
+import FeedbackBoard from "@/components/FeedbackBoard";
 import { supabase } from "@/lib/supabase";
 import { mapRowToCompany } from "@/hooks/useCompanies";
 
@@ -38,6 +39,10 @@ export default async function Home() {
                     <FactBoard initialCompanies={formattedCompanies} />
                     <VotingBooth initialCompanies={formattedCompanies} />
                 </div>
+            </section>
+
+            <section className="container mx-auto px-4 pb-12">
+                <FeedbackBoard />
             </section>
 
             <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
