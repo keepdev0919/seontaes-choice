@@ -6,7 +6,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import ThemeToggle from "@/components/ThemeToggle";
 import JsonLd from "@/components/JsonLd";
-import ChatRoom from "@/components/ChatRoom";
 
 const GA_ID = "G-G64WXQ2F2T";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://seontaes-choice.vercel.app";
@@ -101,7 +100,6 @@ export default function RootLayout({
                     {children}
                     <Toaster />
                     <Sonner />
-                    <ChatRoom />
                 </Providers>
             </body>
         </html>
