@@ -19,6 +19,7 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_P
 const VIDEO_IDS = [
     "n8fdEYaDtfM",  // 김선태입니다
     "9OWG7ulgUN4",  // 2번째 영상
+    "Oq0tI6dZEmM",  // 새로 추가한 영상
 ];
 const MIN_SUBSCRIBER_COUNT = 1000; // 기업 계정 필터 기준 (구독자 1천 이상)
 

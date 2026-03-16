@@ -16,6 +16,7 @@ interface FactBoardProps {
 const VIDEO_TITLES: Record<string, string> = {
   n8fdEYaDtfM: "김선태입니다",
   "9OWG7ulgUN4": "100만 구독자 감사합니다",
+  Oq0tI6dZEmM: "인생 첫 사무실 홍보",
 };
 
 const VOTE_STORAGE_KEY = "suntae-vote";
