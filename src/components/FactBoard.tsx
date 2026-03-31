@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThumbsUp, MessageSquare, Vote, HelpCircle, Youtube, Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import type { Company } from "@/data/mockData";
-import { useCompanies, useVote } from "@/hooks/useCompanies";
+import { useCompanies } from "@/hooks/useCompanies";
 
 interface FactBoardProps {
   initialCompanies: Company[];
@@ -19,47 +18,20 @@ const VIDEO_TITLES: Record<string, string> = {
   Oq0tI6dZEmM: "인생 첫 사무실 홍보",
 };
 
-const VOTE_STORAGE_KEY = "suntae-vote";
-
-function getVotedToday(): string | null {
-  try {
-    const data = JSON.parse(localStorage.getItem(VOTE_STORAGE_KEY) || "{}");
-    const today = new Date().toISOString().slice(0, 10);
-    return data.date === today ? data.companyId : null;
-  } catch {
-    return null;
-  }
-}
-
-function setVotedToday(companyId: string) {
-  const today = new Date().toISOString().slice(0, 10);
-  localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify({ date: today, companyId }));
-}
 
 const FactBoard = ({ initialCompanies }: FactBoardProps) => {
   const { data: companies = [] } = useCompanies(initialCompanies);
-  const voteMutation = useVote();
 
-  const [votedId, setVotedId] = useState<string | null>(null);
+  const [votedId] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [search, setSearch] = useState("");
   const sorted = [...companies]
     .sort((a, b) => b.youtubeLikes - a.youtubeLikes)
     .filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
 
-  useEffect(() => {
-    setVotedId(getVotedToday());
-  }, []);
-
-  const handleVote = (company: Company) => {
-    if (votedId) {
-      toast.error("오늘은 이미 투표하셨습니다! 내일 다시 도전하세요 ");
-      return;
-    }
-    setVotedToday(company.id);
-    setVotedId(company.id);
-    voteMutation.mutate(company.id);
-    toast.success(`${company.name}에 투표 완료! 🎉`);
+  const handleVote = (company: { name: string }) => {
+    void company;
+    toast.error("서비스가 종료되어 투표가 불가합니다.");
   };
 
   return (
